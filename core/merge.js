@@ -378,18 +378,20 @@ class Merge {
         doc.remote = was.remote
       }
       move(side, was, doc)
-      if (file && metadata.sameFile(file, doc)) {
-        log.info({ path }, 'up to date (move)')
-        return null
-      } else if (file && !doc.overwrite && doc.path === file.path) {
-        const dst = await this.resolveConflictAsync(side, doc, file)
-        was.moveTo = dst._id
-        dst.sides = { target: 1, [side]: 1 }
-        return this.pouch.bulkDocs([was, dst])
-      } else if (file && doc.overwrite) {
-        doc._rev = file._rev
-        await this.ensureParentExistAsync(side, doc)
-        return this.pouch.bulkDocs([was, doc])
+      if (file) {
+        if (metadata.sameFile(file, doc)) {
+          log.info({ path }, 'up to date (move)')
+          return null
+        } else if (doc.overwrite) {
+          doc._rev = file._rev
+          await this.ensureParentExistAsync(side, doc)
+          return this.pouch.bulkDocs([was, doc])
+        } else {
+          const dst = await this.resolveConflictAsync(side, doc, file)
+          was.moveTo = dst._id
+          dst.sides = { target: 1, [side]: 1 }
+          return this.pouch.bulkDocs([was, dst])
+        }
       } else {
         await this.ensureParentExistAsync(side, doc)
 
