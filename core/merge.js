@@ -382,7 +382,8 @@ class Merge {
         if (metadata.sameFile(file, doc)) {
           log.info({ path }, 'up to date (move)')
           return null
-        } else if (doc.overwrite) {
+        } else if (doc.overwrite || metadata.isAtLeastUpToDate(side, file)) {
+          doc.overwrite = file
           doc._rev = file._rev
           await this.ensureParentExistAsync(side, doc)
           return this.pouch.bulkDocs([was, doc])
