@@ -79,6 +79,7 @@ type ScenarioTestsDisabled = {[ScenarioTestName]: Explanation}
 export type Scenario = {|
   platforms?: Array<'win32'|'darwin'|'linux'>,
   side?: SideName,
+  noCaptures?: boolean,
   disabled?: ScenarioCompletelyDisabled | ScenarioTestsDisabled,
   init?: Array<{|
     ino: number, path: string, content?: string
